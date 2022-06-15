@@ -9,8 +9,9 @@ import LightOff from './images/light_off.gif';
 
 import Spinner from './Spinner';
 
-const CALL_LIMIT = 30;
-const TIME_SLEEP = 1500;
+const CALL_LIMIT = 100;
+const TIME_WAITING = 500;
+const TIME_DELAY = 1500;
 const LIGHTS_DEFAULT = [
   { id: 1, status: false, name: 'field1' },
   { id: 2, status: false, name: 'field2' },
@@ -83,6 +84,7 @@ const App = () => {
   }, []);
 
   const updateLightStatus = async (light, status) => {
+    console.log('Run');
     // start loading
     setLoading(true);
     setLoadingId(light.id);
@@ -106,11 +108,12 @@ const App = () => {
       // Neu ket qua = 0 (loi) => Tiep tuc goi lai de cap nhat cho duoc trang thai bong den tren server
       while (res == '0' && count != CALL_LIMIT) {
         count++;
+        await sleep(TIME_WAITING);
         res = await updateStatus(query);
       }
 
       // Delay khoang thoi gian de dong bo theo server
-      await sleep(TIME_SLEEP);
+      await sleep(TIME_DELAY);
 
       // Chinh thuc cap nhat trang thai bong den do tren web
       setLights(newState);
@@ -138,9 +141,10 @@ const App = () => {
           {lights.map((item, index) => {
             return (
               <div
-                className='box'
+                className={`box ${loading ? 'is-disabled' : ''}`}
                 key={item.id}
                 onClick={() => updateLightStatus(item, !item.status)}
+                aria-disabled={loading}
               >
                 {loading && loadingId == item.id && (
                   <div className='loading'>

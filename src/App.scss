@@ -46,6 +46,13 @@
       display: flex;
       flex-wrap: wrap;
       cursor: pointer;
+
+      .is-disabled {
+        pointer-events: none;
+        opacity: 0.7;
+        cursor: not-allowed !important;
+      }
+
       .box {
         flex: 1 0 21%;
         margin: 5px;

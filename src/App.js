@@ -5,9 +5,9 @@ import React, { useEffect, useState } from 'react';
 import './App.scss';
 
 import LightOn from './images/light_on.gif';
-import LightOff from './images/light_on.gif';
+import LightOff from './images/light_off.gif';
 
-const CALL_LIMIT = 100;
+const CALL_LIMIT = 30;
 const TIME_SLEEP = 1500;
 const LIGHTS_DEFAULT = [
   { id: 1, status: false, name: 'field1' },
@@ -27,13 +27,14 @@ const URL_UPDATE_STATUS =
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-const getStatus = async () =>
-  fetch(URL_GET_STATUS)
+const getStatus = async () => {
+  return fetch(URL_GET_STATUS)
     .then((response) => response.json())
     .catch((err) => {
       console.log('updateStatus => err => ', err);
       throw new Error(err);
     });
+};
 
 const updateStatus = async (query) => {
   return fetch(`${URL_UPDATE_STATUS}${query}`)
@@ -47,6 +48,7 @@ const updateStatus = async (query) => {
 const App = () => {
   const [lights, setLights] = useState(LIGHTS_DEFAULT);
 
+  // Goi len server lay ve thong tin status cua tat ca cac bong den
   useEffect(() => {
     const fetchStatus = async () => {
       try {
@@ -55,6 +57,7 @@ const App = () => {
         let id = 0;
         const newLights = [];
 
+        // Format lai du lieu status bong den
         for (const [key, value] of Object.entries(result)) {
           if (key.startsWith('field')) {
             newLights.push({
@@ -65,6 +68,7 @@ const App = () => {
           }
         }
 
+        // Set status cac bong den
         setLights(newLights);
       } catch (error) {
         console.log('error: ', error);

@@ -7,6 +7,8 @@ import './App.scss';
 import LightOn from './images/light_on.gif';
 import LightOff from './images/light_off.gif';
 
+import Spinner from './Spinner';
+
 const CALL_LIMIT = 30;
 const TIME_SLEEP = 1500;
 const LIGHTS_DEFAULT = [
@@ -47,6 +49,8 @@ const updateStatus = async (query) => {
 
 const App = () => {
   const [lights, setLights] = useState(LIGHTS_DEFAULT);
+  const [loading, setLoading] = useState(false);
+  const [loadingId, setLoadingId] = useState(0);
 
   // Goi len server lay ve thong tin status cua tat ca cac bong den
   useEffect(() => {
@@ -79,6 +83,10 @@ const App = () => {
   }, []);
 
   const updateLightStatus = async (light, status) => {
+    // start loading
+    setLoading(true);
+    setLoadingId(light.id);
+
     // Tim kiem va cap nhat tam thoi lai status cua bong den tren web
     const index = lights.findIndex((item) => item.id == light.id);
     const newState = [...lights];
@@ -106,40 +114,51 @@ const App = () => {
 
       // Chinh thuc cap nhat trang thai bong den do tren web
       setLights(newState);
+
+      // Cancel loading
+      setLoading(false);
+      setLoadingId(0);
     } catch (error) {
       console.log('error: ', error);
     }
   };
 
   return (
-    <div className='house container'>
-      <div className='room-list'>
-        {lights.map((item) => {
-          return (
-            <div className='room' key={item.id}>
-              {/* <input
-                className={`light ${status && 'on'}`}
-                type="checkbox"
-                onChange={() => handleLight(id, !status)}
-              ></input> */}
-              {item.status ? (
-                <img
-                  className='banner'
-                  src={LightOn}
-                  onClick={() => updateLightStatus(item, false)}
-                  alt='lightOn'
-                />
-              ) : (
-                <img
-                  className='banner'
-                  src={LightOff}
-                  onClick={() => updateLightStatus(item, true)}
-                  alt='lightOff'
-                />
-              )}
-            </div>
-          );
-        })}
+    <div className='container'>
+      <div className='header'>
+        <h1 className='title'>Đồ án tốt nghiệp</h1>
+        <h2 className='sub-title'>
+          <u>Đề tài: </u>Thiết kế và thi công mô hình giám sát hệ thống máy lạnh
+        </h2>
+
+        <h3 className='description'>Hệ thống kiểm soát máy lạnh</h3>
+      </div>
+      <div className='main'>
+        <div className='wrapper'>
+          {lights.map((item, index) => {
+            return (
+              <div
+                className='box'
+                key={item.id}
+                onClick={() => updateLightStatus(item, !item.status)}
+              >
+                {loading && loadingId == item.id && (
+                  <div className='loading'>
+                    <Spinner />
+                  </div>
+                )}
+
+                {item.status ? (
+                  <img className='image' src={LightOn} alt='lightOn' />
+                ) : (
+                  <img className='image' src={LightOff} alt='lightOff' />
+                )}
+
+                <span className='title'>Máy lạnh {index + 1}</span>
+              </div>
+            );
+          })}
+        </div>
       </div>
     </div>
   );
